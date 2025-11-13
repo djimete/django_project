@@ -1,0 +1,12 @@
+<!-- upload_form.html -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload PDF</button>
+</form>
+
+<br>
+
+<a href="{% url 'administration' %}">Revenir à Administration</a>
+<br><br>
+<a href="{% url 'filieres' %}">Revenir aux Filières</a>

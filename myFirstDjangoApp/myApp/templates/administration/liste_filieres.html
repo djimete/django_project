@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Liste des Filières{% endblock %}
+
+{% block content %}
+<h2>Liste des filières</h2>
+<a href="{% url 'ajouter_filiere' %}" class="btn btn-primary mb-3">Ajouter une filière</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for filiere in filieres %}
+        <tr>
+            <td>{{ filiere.nom }}</td>
+            <td>{{ filiere.description }}</td>
+            <td>
+                <a href="{% url 'etudiants_par_filiere' filiere.id %}" class="btn btn-info btn-sm">Voir étudiants</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

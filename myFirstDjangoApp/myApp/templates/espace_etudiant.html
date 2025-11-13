@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Espace Étudiant{% endblock %}
+
+{% block content %}
+<h2>Bienvenue, {{ etudiant.firstname }} {{ etudiant.lastname }}</h2>
+
+<div class="row mt-4">
+    <!-- Colonne profil étudiant -->
+    <div class="col-md-3 text-center">
+        <img src="{{ etudiant.profile_picture.url }}" class="img-thumbnail mb-2" style="width:150px;height:150px;border-radius:50%;">
+        <p><strong>Téléphone:</strong> {{ etudiant.telephone }}</p>
+        <p><strong>Date de naissance:</strong> {{ etudiant.date_naissance }}</p>
+    </div>
+
+    <!-- Colonne documents et supports -->
+    <div class="col-md-9">
+        <!-- Cours -->
+        <h4>Mes Cours</h4>
+        <ul>
+            {% for c in cours %}
+                <li><a href="{{ c.fichier.url }}" target="_blank">{{ c.titre }}</a></li>
+            {% empty %}
+                <li>Aucun cours disponible.</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Exercices -->
+        <h4>Mes Exercices</h4>
+        <ul>
+            {% for e in exercices %}
+                <li><a href="{{ e.fichier.url }}" target="_blank">{{ e.titre }}</a></li>
+            {% empty %}
+                <li>Aucun exercice disponible.</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Emploi du temps -->
+        <h4>Emploi du temps</h4>
+        <ul>
+            {% for em in emplois %}
+                <li><a href="{{ em.fichier.url }}" target="_blank">{{ em.titre }}</a></li>
+            {% empty %}
+                <li>Aucun emploi du temps disponible.</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Bulletins et Diplômes -->
+        <h4>Bulletins et Diplômes</h4>
+        <ul>
+            {% if etudiant.bulletin %}
+                <li><a href="{{ etudiant.bulletin.url }}" target="_blank">Bulletin</a></li>
+            {% endif %}
+            {% if etudiant.diplome %}
+                <li><a href="{{ etudiant.diplome.url }}" target="_blank">Diplôme</a></li>
+            {% endif %}
+            {% if not etudiant.bulletin and not etudiant.diplome %}
+                <li>Aucun document disponible.</li>
+            {% endif %}
+        </ul>
+
+        <!-- Contenus pédagogiques -->
+        <h4>Documents pédagogiques</h4>
+        <ul>
+            {% for doc in documents %}
+                <li><a href="{{ doc.pdf_file.url }}" target="_blank">{{ doc.title }}</a></li>
+            {% empty %}
+                <li>Aucun document disponible.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Inscription Étudiant{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Créer un compte Étudiant</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Nom d'utilisateur -->
+        <div class="mb-3">
+            <label for="id_username" class="form-label">Nom d'utilisateur</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                {{ formulaire.username|add_class:"form-control" }}
+            </div>
+            {% for error in formulaire.username.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label for="id_email" class="form-label">Email</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                {{ formulaire.email|add_class:"form-control" }}
+            </div>
+            {% for error in formulaire.email.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="mb-3">
+            <label for="id_password1" class="form-label">Mot de passe</label>
+            {{ formulaire.password1|add_class:"form-control" }}
+            {% for error in formulaire.password1.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_password2" class="form-label">Confirmer mot de passe</label>
+            {{ formulaire.password2|add_class:"form-control" }}
+            {% for error in formulaire.password2.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Prénom -->
+        <div class="mb-3">
+            <label for="id_firstname" class="form-label">Prénom</label>
+            {{ formulaire.firstname|add_class:"form-control" }}
+            {% for error in formulaire.firstname.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Nom -->
+        <div class="mb-3">
+            <label for="id_lastname" class="form-label">Nom</label>
+            {{ formulaire.lastname|add_class:"form-control" }}
+            {% for error in formulaire.lastname.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Téléphone -->
+        <div class="mb-3">
+            <label for="id_telephone" class="form-label">Téléphone</label>
+            {{ formulaire.telephone|add_class:"form-control" }}
+            {% for error in formulaire.telephone.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Date de naissance -->
+        <div class="mb-3">
+            <label for="id_date_naissance" class="form-label">Date de naissance</label>
+            {{ formulaire.date_naissance|add_class:"form-control" }}
+            {% for error in formulaire.date_naissance.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Photo de profil -->
+        <div class="mb-3">
+            <label for="id_profile_picture" class="form-label">Photo de profil</label>
+            {{ formulaire.profile_picture|add_class:"form-control" }}
+            {% for error in formulaire.profile_picture.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2">S'inscrire</button>
+    </form>
+</div>
+{% endblock %}

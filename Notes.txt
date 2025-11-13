@@ -1,0 +1,79 @@
+User profil : 1. Extend profil en Créant relations : Model_Profils <--> Users ; makemigrations & migrate ; Relationship (manuellement ou automatiquement) 
+		 |-> A partir de maintenant lorsque l'utilisateur se connecte on a la possibilité de lui donner son profil : request.user.<nomProfil>  (***nb: Le profil (nom, prénom, 			     telephone, etc.) de l'utilisateur(login, password, email) qui demande à accèder à la vue***)
+	      2. Profil dynamique : |-> Ajouter profile_picture dans le model             ***
+				    |-> Install pillow then <makemigrations> and migrate  ***
+				    |-> Voir démo on etudiant
+				    |-> Configurer (sur settings.py) l'espace de stockage des profil_pictures uploaded : MEDIA_ROOT = os.path.join(BASE_DIR, static/<espace>) ; Voir démo
+				    |-> Démo ne passe pas; il faut intégrer les MEDIA au projet, pour cela étendre urlpattern de URLS.PY (du projet) au settings.MEDIA_URL ***pour préciser 					la localisation des MEDIA dans le projet : urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)*** Now démo again
+				    |->> Editer le template et Permettre à l'utilisateur de mettre à jour son profil mais sans pouvoir changer le contenu du champ user, pour cela on se 					 rend sur forms.py et on définit la classe qui se charge de cette action. Ensuite on importe la classe sur la view et permettre à l'utilisateur 					 courant de pouvoir modifier son profil (***qui est unique***)
+				       > Définir l'action à mener (enregistrement du nouveau profil) si le formulaire est soumis
+				       > Indiquer aussi comme source des images du userProfile, le MEDIA_ROOT où se localise tous les fichiers uploaded (***user_profile.pict.url***)
+				    |->> Permettre la création d'un user sans profil, non plus seulement à l'admin (par attachement manuel), mais aussi à l'utilisateur.
+				       > Pour cela il faut d'abord créer un profil sans user en mettant le **user blank à true** (user = models.OneToOneField(User, null=True, blank=True, 					 on_delete=models.CASCADE) ; nb : on_delete=models.CASCADE signifiant que si l'utilisateur est supprimer, son profil aussi l'est.
+				       > Ajouter, tjrs sur le profil, un avatar (le MEDIA_ROOT étant déjà configuré, on ajoute la source directe de l'image par son nom
+  			            |->Créer un profil à chaque utilisateur qui s'inscrit
+				    |-> Optionnel : Cacher la page profil aux admins
+				    |-> TEST
+
+-------------
+decorators : insérer une action avant d'appeler la fonction originale
+ 	     Verification préalable *sur le demandeur et la nature de sa demande* avant d'exécuter la fonction view demandée par le user (request.user)
+
+             <Dans le cas du logout, ne pas appliquer le decoration>
+
+             1. decorators pour un demandeur
+             2. decorators pour catégorie de demandeur (récupérer le nom du group > ...)
+
+	    |-> decorators (view_func) : Si le demandeur fait partie d'un group liste, il accède au decorator dans le cas contraire il est bloqué
+ 
+  	    |-> Tâches spécifiques : - Ne pas permettre à un admin lorsqu'il est connecté d'aller sur login ou register page :     decorator -> view
+ 			   	     - Gestion permissions pour un (ou plusieurs) groupe(s) :     group -> decorator -> view (Voir exemples)
+ 			   	     -  			   
+			   	     - ......... (video 14, Restricting login)
+ 			  	     - 
+-------------
+Views & Roles : 1. - Administrateur : |-> Liste Etudiants par filière
+  	    		    	      |-> Upload Cours, emploi du temps pour toute une filière
+  	    		    	      |-> Upload Bulletin pour un étudiant
+  	    		    	      |-> Supprimer un étudiant +++++++++++++++
+  	    		    	      |-> Supprimer un groupe d'étudiants +++++
+
+		  - Etudiant        : |-> Consulter (et télécharger au besoin) ses Cours, Bulletins et Emplois du temps
+  	    		    	      |-> 
+		2. Réalisation      :
+  	    		    	      |-> Liste Etudiants par filière (A compléter)
+  	    		    	      |-> Concernant "Upload Bulletin pr un étudiant", Créer un nouveau formulaire et permettre à l'admin de pouvoir modifier que le champ Bulletin de l'étd
+  	    		    	      |-> Concernant "Upload Cours, emploi du temps pour toute une filière", { Add new input field on click + Browse file button }
+  	    		    	      |-> 
+  	    		    	      
+				   *** 1. LISTE ETD PAR FILIERE PAR GROUPE ;;; 2. LIEN COURS : UPLOAD COURS PAR GROUPE & AFFICHER COURS PAR ETUDIANT PAR GROUPE	
+			           *** Statique files, success messages, LIENS ***    		    	      
+				   *** BASE DE DONNEES, {QUERIES, SIGNALS}, GESTION ERREURS & DEPLOIEMENT
+
+--------------
+Reset passwd email : 1. Objectifs : Permettre à l'utilisateur qui oublie son mot de passe de le réinitialiser par email 
+				    |-> *Demande de reset*										 			(PasswordResetView)
+				    |-> *Demande exécuté* et l'utilisateur est informé qu'il doit voir son email				 	 	(PasswordResetDoneView)
+				    |-> *Confirmation (sécurisée) de la demande* du reset en cliquant sur le mail envoyé qu'il clique sur un link		(PasswordResetConfirm)
+				    |-> Le link de confirmation l'envoie à la page du formulaire de réinitialisation de son mot de passe	 		(PasszordResetComplete)
+			NB : L'un fait appelle à l'autre
+		     2. Réalisation :
+				    |-> Configuration compte gmail de l'expéditeur des emails (SETTINGS.PY)
+				    |-> Renseigner les paths (accounts/password_reset/, accounts/password_reset/done/, accounts/reset/<uidb64>/<token>, accounts/reset_password_complete/) 					sur URLS.PY 
+				    |-> Compléter les paths en renseignant sur URLS.PY (du projet) le dossier 'accounts'
+				    |-> Editer les Templates : password_reset.html, password_sent.html, password_form.html, password_done.html(renseigner le lien vers login page : 						/accounts/login)
+				    |-> login.html : Indiquer le lien (url) vers password_reset pour mot de passe oublié
+				    |-> TEST
+
+--------------
+Forum/Contact (chatbot) :										# request.user.<etudiant>.group_name
+	     
+
+--------------------------------------------------
+Last course : |-> Databases (21, 22)
+              |-> Queries, {Signals}
+	      |-> Gestion des erreurs (avec les decorators)
+
+--------------------------------------------------
+TP final : CRM avec Upload files, Sécurité, Déploiement
+     	   & différencier les customer and admin

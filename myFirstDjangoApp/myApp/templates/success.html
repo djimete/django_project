@@ -1,0 +1,12 @@
+<p>Document téléchargé avec succès</p>
+{% for doc in documents %}
+    <ul>
+        <li>
+            {{ doc.pdf_file }} ajouté le {{ doc.uploaded_at }} pour le cours de {{ doc.title }}
+        </li>
+    </ul>
+{% endfor %}
+
+<a href="{% url 'administration' %}">Revenir à Administration</a>
+<br><br>
+<a href="{% url 'filieres' %}">Revenir aux Filières</a>

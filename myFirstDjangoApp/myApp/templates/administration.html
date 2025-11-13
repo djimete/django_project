@@ -1,0 +1,23 @@
+{% extends "master.html" %}
+
+{% block title %}
+myApp
+{% endblock %}
+
+{% block content %}
+
+<p><a href="/">HOME</a></p>
+
+<!--p><a href="{% url 'logout' %}">Logout</a></p-->
+
+<h1>ISEP - Administration :</h1>
+
+<ul>
+    <li><a href="filieres/"><button>Afficher liste étudiants par filiere</button></a></li>
+    <br>
+    <li><a href="{% url 'upload_pdf' %}"><button>Ajouter cours pour une filière</button></a></li>  
+</ul>
+{% endblock %}
+
+</body>
+</html>

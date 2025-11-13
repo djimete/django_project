@@ -1,0 +1,30 @@
+{% extends "master.html" %}
+
+{% block title %}
+myApp
+{% endblock %}
+
+{% block content %}
+
+<p><a href="/">HOME</a></p>
+
+<p><a href="{% url 'logout' %}">Logout</a></p>
+
+<h1>Liste étudiants :</h1>
+  
+<ul>
+  {% for x in listEtudiants %}
+    <li><a href="details/{{ x.id }}">{{ x.firstname }} {{ x.lastname }}</a></li>
+  {% endfor %}
+</ul>
+
+<br>
+
+<a href="{% url 'upload_pdf' %}"><button>Ajouter cours pour une filière</button></a>
+
+<br><br><br>
+<a href="{% url 'filieres' %}">Revenir aux Filières</a>
+{% endblock %}
+
+</body>
+</html>

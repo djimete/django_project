@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails Étudiant{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Détails de {{ etudiant.firstname }} {{ etudiant.lastname }}</h2>
+    <div class="row mt-3">
+        <!-- Profil de l'étudiant -->
+        <div class="col-md-4">
+            <div class="card text-center">
+                <img class="profile-pic img-thumbnail mt-3"
+                     src="{% if etudiant.profile_picture %}{{ etudiant.profile_picture.url }}{% else %}{% static 'images/default.png' %}{% endif %}" 
+                     alt="Photo de profil">
+                <div class="card-body">
+                    <p><strong>Téléphone:</strong> {{ etudiant.telephone }}</p>
+                    <p><strong>Date de naissance:</strong> {{ etudiant.dateNaissance }}</p>
+                    <p><strong>Filière:</strong> {{ etudiant.filiere.nom }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire Upload Bulletin / PDF -->
+        <div class="col-md-8">
+            <div class="card card-body">
+                <h4>Mettre à jour Bulletin / Certificat</h4>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ formulaire.as_p }}
+                    <button type="submit" class="btn btn-primary mt-2">Enregistrer</button>
+                </form>
+
+                <!-- Affichage des fichiers existants -->
+                <hr>
+                {% if etudiant.pdf_file %}
+                    <p>PDF actuel : <a href="{{ etudiant.pdf_file.url }}" target="_blank">Voir PDF</a></p>
+                {% endif %}
+                {% if etudiant.bulletin %}
+                    <p>Bulletin actuel : <a href="{{ etudiant.bulletin.url }}" target="_blank">Voir Bulletin</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-pic {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+</style>
+{% endblock %}

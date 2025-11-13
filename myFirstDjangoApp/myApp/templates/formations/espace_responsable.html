@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Espace Responsable{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Bienvenue dans votre espace, {{ request.user.username }} !</h2>
+    <p>Vous pouvez gérer vos cours, exercices, emplois du temps et contenus pédagogiques depuis cet espace.</p>
+
+    <div class="mt-4">
+        <a href="{% url 'ajouter_cours' %}" class="btn btn-success mb-2">Ajouter un cours</a><br>
+        <a href="{% url 'ajouter_exercice' %}" class="btn btn-warning mb-2">Ajouter un exercice</a><br>
+        <a href="{% url 'ajouter_emploi_du_temps' %}" class="btn btn-info mb-2">Ajouter un emploi du temps</a><br>
+        <a href="{% url 'upload_contenu_pedagogique' %}" class="btn btn-primary mb-2">Uploader un contenu pédagogique</a>
+    </div>
+
+    <hr>
+
+    <h3 class="mt-4">Contenus pédagogiques déjà uploadés</h3>
+    {% if contenus %}
+        <ul class="list-group">
+            {% for contenu in contenus %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ contenu.titre }}
+                    <a href="{{ contenu.fichier.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Voir / Télécharger</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun contenu pédagogique disponible pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}
