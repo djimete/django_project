@@ -27,9 +27,9 @@ class Etudiant(models.Model):
     lastname = models.CharField(max_length=255)
     telephone = models.CharField(max_length=20, blank=True)
     date_naissance = models.DateField(null=True, blank=True)
-    diplome = models.CharField(max_length=255, null=True, blank=True) 
+    filiere = models.ForeignKey(Filiere, on_delete=models.SET_NULL, null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True, default='profiles/default.png')
-    bulletin = models.FileField(upload_to='bulletins/', blank=True, null=True)
+   
 
     def __str__(self):
         return f"{self.firstname} {self.lastname}"

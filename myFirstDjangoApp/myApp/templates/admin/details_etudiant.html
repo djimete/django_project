@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails Étudiant{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Modifier l'étudiant : {{ etudiant.firstname }} {{ etudiant.lastname }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary mt-2">Enregistrer</button>
+    </form>
+</div>
+{% endblock %}

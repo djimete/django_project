@@ -16,6 +16,7 @@
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
+        <!-- Informations du compte -->
         <h4>Informations du compte</h4>
         <hr>
 
@@ -47,6 +48,7 @@
             {{ user_form.password2.errors }}
         </div>
 
+        <!-- Informations personnelles -->
         <h4 class="mt-4">Informations personnelles</h4>
         <hr>
 
@@ -76,6 +78,13 @@
             <label class="form-label">Date de naissance</label>
             {{ etudiant_form.date_naissance|add_class:"form-control" }}
             {{ etudiant_form.date_naissance.errors }}
+        </div>
+
+        <!-- Filière -->
+        <div class="mb-3">
+            <label class="form-label">Filière</label>
+            {{ etudiant_form.filiere|add_class:"form-select" }}
+            {{ etudiant_form.filiere.errors }}
         </div>
 
         <!-- Photo de profil -->

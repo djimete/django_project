@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Espace Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Bienvenue dans l'espace Admin</h2>
+    <div class="list-group mt-3">
+        <a href="{% url 'liste_filieres' %}" class="list-group-item list-group-item-action">Gestion des filières</a>
+        <a href="{% url 'ajouter_etudiant' %}" class="list-group-item list-group-item-action">Ajouter un étudiant</a>
+    </div>
+</div>
+{% endblock %}

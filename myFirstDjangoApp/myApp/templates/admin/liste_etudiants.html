@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Étudiants{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Étudiants de la filière : {{ filieres.nom }}</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Téléphone</th>
+                <th>Date de naissance</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for etudiant in etudiants %}
+            <tr>
+                <td>{{ etudiant.lastname }}</td>
+                <td>{{ etudiant.firstname }}</td>
+                <td>{{ etudiant.telephone }}</td>
+                <td>{{ etudiant.date_naissance }}</td>
+                <td>
+                    <a href="{% url 'details_etudiant' etudiant.id %}" class="btn btn-primary btn-sm">Modifier</a>
+                    <a href="{% url 'supprimer_etudiant' etudiant.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Aucun étudiant dans cette filière.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

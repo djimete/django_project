@@ -5,22 +5,14 @@ from django.forms import ModelForm
 from .models import Etudiant, Filiere, Cours, Exercice, EmploiDuTemps, ContenuPedagogique
 
 # ===========================
-# Formulaire d'inscription utilisateur + étudiant
+# Formulaire pour créer un utilisateur
 # ===========================
 class CreateUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    firstname = forms.CharField(max_length=255, required=True)
-    lastname = forms.CharField(max_length=255, required=True)
-    telephone = forms.CharField(max_length=20, required=True)
-    date_naissance = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    profile_picture = forms.ImageField(required=False)
 
     class Meta:
         model = User
-        fields = [
-            'username', 'email', 'password1', 'password2',
-            'firstname', 'lastname', 'telephone', 'date_naissance', 'profile_picture'
-        ]
+        fields = ['username', 'email', 'password1', 'password2']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -29,15 +21,21 @@ class CreateUserForm(UserCreationForm):
         return email
 
 # ===========================
-# Formulaire pour créer un étudiant (admin)
+# Formulaire pour ajouter un étudiant
 # ===========================
 class EtudiantForm(ModelForm):
+    filiere = forms.ModelChoiceField(
+        queryset=Filiere.objects.all(),
+        required=True,
+        label="Filière"
+    )
+
     class Meta:
         model = Etudiant
         fields = [
             'firstname', 'lastname', 'telephone',
-            'date_naissance', 'filiere', 'profile_picture',
-            'bulletin', 'diplome'
+            'date_naissance', 'filiere',
+            'profile_picture'
         ]
         widgets = {
             'date_naissance': forms.DateInput(attrs={'type': 'date'}),
@@ -51,8 +49,8 @@ class UpdateEtudiantForm(ModelForm):
         model = Etudiant
         fields = [
             'firstname', 'lastname', 'telephone',
-            'date_naissance', 'filiere', 'profile_picture',
-            'bulletin', 'diplome'
+            'date_naissance', 'filiere',
+            'profile_picture'
         ]
         widgets = {
             'date_naissance': forms.DateInput(attrs={'type': 'date'}),
@@ -81,6 +79,9 @@ class ContenuPedagogiqueForm(forms.ModelForm):
         model = ContenuPedagogique
         fields = ['titre', 'fichier']
 
+# ===========================
+# Formulaire Filière
+# ===========================
 class FiliereForm(forms.ModelForm):
     class Meta:
         model = Filiere

@@ -3,10 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
-from django.conf import settings
-import os
 
-from .models import Etudiant, Filiere, ContenuPedagogique  # ajoute d'autres modèles si nécessaire
+from .models import Etudiant, Filiere, Cours, Exercice, EmploiDuTemps, ContenuPedagogique
 from .forms import (
     CreateUserForm, EtudiantForm, UpdateEtudiantForm,
     FiliereForm, CoursForm, ExerciceForm,
@@ -44,33 +42,78 @@ def register(request):
     })
 
 
+# ---------------------------
+# Inscription Admin
+# ---------------------------
 @unauthenticated_user
-def login_view(request):
+def register_admin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
 
+        # Vérifier si le username existe déjà
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Ce nom d'utilisateur existe déjà.")
+            return redirect('register_admin')
+
+        # Vérifier si l'email existe déjà
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Cet email est déjà utilisé.")
+            return redirect('register_admin')
+
+        # Créer l'utilisateur admin
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # Ajouter l'utilisateur dans le groupe admin_filiere
+        group, _ = Group.objects.get_or_create(name='admin_filiere')
+        user.groups.add(group)
+
+        messages.success(request, "Compte administrateur créé avec succès.")
+        return redirect('login')
+
+    return render(request, 'register_admin.html')
+
+
+# =========================
+# Connexion
+# =========================
+@unauthenticated_user
+def loginPage(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
         if user:
             auth_login(request, user)
 
-            if user.groups.filter(name='responsable').exists():
-                return redirect('espace_responsable')
+            # Redirection selon le groupe
+            if user.groups.filter(name='admin_filiere').exists():
+                return redirect("espace_admin")
+            elif user.groups.filter(name='responsable').exists():
+                return redirect("espace_responsable")
             elif user.groups.filter(name='etudiant').exists():
-                return redirect('espace_etudiant')
-            elif user.is_superuser:
-                return redirect('admin:index')
+                return redirect("espace_etudiant")
             else:
-                return redirect('home')
+                return redirect("home")
 
-        messages.error(request, 'Nom d’utilisateur ou mot de passe incorrect.')
+        messages.error(request, "Identifiants incorrects.")
 
-    return render(request, 'login.html')
+    return render(request, "login.html")
 
 
+# =========================
+# Déconnexion
+# =========================
+@login_required
 def logout_view(request):
     auth_logout(request)
-    return redirect('login')
+    return redirect("login")
 
 
 # =========================
@@ -88,17 +131,26 @@ def espace_etudiant(request):
 
 
 # =========================
-# Administration
+# Espace Admin
 # =========================
 @login_required
-@allowed_users(allowed_users=['admin'])
+@allowed_users(['admin_filiere'])
+def espace_admin(request):
+    return render(request, 'admin/espace_admin.html')
+
+
+# =========================
+# Gestion Filières
+# =========================
+@login_required
+@allowed_users(['admin_filiere'])
 def liste_filieres(request):
     filieres = Filiere.objects.all()
-    return render(request, 'administration/liste_filieres.html', {'filieres': filieres})
+    return render(request, 'admin/liste_filieres.html', {'filieres': filieres})
 
 
 @login_required
-@allowed_users(allowed_users=['admin'])
+@allowed_users(['admin_filiere'])
 def ajouter_filiere(request):
     form = FiliereForm()
     if request.method == 'POST':
@@ -107,61 +159,64 @@ def ajouter_filiere(request):
             form.save()
             messages.success(request, "Filière ajoutée avec succès.")
             return redirect('liste_filieres')
-    return render(request, 'administration/ajouter_filiere.html', {'form': form})
+    return render(request, 'admin/ajouter_filiere.html', {'form': form})
 
 
+# =========================
+# Gestion Étudiants
+# =========================
 @login_required
-@allowed_users(allowed_users=['admin'])
+@allowed_users(['admin_filiere'])
 def ajouter_etudiant(request):
     form = EtudiantForm()
-    filieres = Filiere.objects.all()
     if request.method == 'POST':
         form = EtudiantForm(request.POST, request.FILES)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         if form.is_valid():
-            new_etudiant = form.save(commit=False)
-            username = request.POST.get('username')
-            password = request.POST.get('password')
             user = User.objects.create_user(username=username, password=password)
-            group = Group.objects.get(name='etudiant')
+            group, _ = Group.objects.get_or_create(name='etudiant')
             user.groups.add(group)
-            new_etudiant.user = user
-            new_etudiant.save()
-            messages.success(request, f"L'étudiant {new_etudiant.firstname} {new_etudiant.lastname} a été ajouté.")
+
+            etudiant = form.save(commit=False)
+            etudiant.user = user
+            etudiant.save()
+            messages.success(request, f"Étudiant {etudiant.firstname} ajouté avec succès.")
             return redirect('liste_filieres')
-    return render(request, 'administration/ajouter_etudiant.html', {'form': form, 'filieres': filieres})
+    return render(request, 'admin/ajouter_etudiant.html', {'form': form})
 
 
 @login_required
-@allowed_users(allowed_users=['admin'])
-def etudiants_par_filiere(request, filiere_id):
+@allowed_users(['admin_filiere'])
+def liste_etudiants_par_filiere(request, filiere_id):
     filiere = get_object_or_404(Filiere, id=filiere_id)
     etudiants = Etudiant.objects.filter(filiere=filiere)
-    return render(request, 'administration/etudiants_par_filiere.html', {'filiere': filiere, 'etudiants': etudiants})
+    return render(request, 'admin/liste_etudiants.html', {'filieres': filiere, 'etudiants': etudiants})
 
 
 @login_required
-@allowed_users(allowed_users=['admin'])
-def details(request, id):
-    etudiant = get_object_or_404(Etudiant, id=id)
+@allowed_users(['admin_filiere'])
+def details_etudiant(request, etudiant_id):
+    etudiant = get_object_or_404(Etudiant, id=etudiant_id)
     form = UpdateEtudiantForm(instance=etudiant)
     if request.method == 'POST':
         form = UpdateEtudiantForm(request.POST, request.FILES, instance=etudiant)
         if form.is_valid():
             form.save()
-            messages.success(request, "Informations de l'étudiant mises à jour avec succès.")
-            return redirect('details', id=etudiant.id)
-    return render(request, 'administration/details.html', {'formulaire': form, 'etudiant': etudiant})
+            messages.success(request, "Étudiant mis à jour avec succès.")
+            return redirect('details_etudiant', etudiant_id=etudiant.id)
+    return render(request, 'admin/details_etudiant.html', {'form': form, 'etudiant': etudiant})
 
 
 @login_required
-@allowed_users(allowed_users=['admin'])
+@allowed_users(['admin_filiere'])
 def supprimer_etudiant(request, etudiant_id):
     etudiant = get_object_or_404(Etudiant, id=etudiant_id)
     filiere_id = etudiant.filiere.id if etudiant.filiere else None
     etudiant.delete()
-    messages.success(request, f"L'étudiant {etudiant.firstname} {etudiant.lastname} a été supprimé.")
+    messages.success(request, f"Étudiant {etudiant.firstname} supprimé.")
     if filiere_id:
-        return redirect('etudiants_par_filiere', filiere_id=filiere_id)
+        return redirect('liste_etudiants_par_filiere', filiere_id=filiere_id)
     return redirect('liste_filieres')
 
 
@@ -169,13 +224,13 @@ def supprimer_etudiant(request, etudiant_id):
 # Responsable / Formations
 # =========================
 @login_required
-@allowed_users(allowed_users=['responsable', 'admin'])
+@allowed_users(['responsable', 'admin_filiere'])
 def espace_responsable(request):
     return render(request, 'formations/espace_responsable.html')
 
 
 @login_required
-@allowed_users(allowed_users=['responsable', 'admin'])
+@allowed_users(['responsable', 'admin_filiere'])
 def ajouter_cours(request):
     if request.method == 'POST':
         form = CoursForm(request.POST, request.FILES)
@@ -191,7 +246,7 @@ def ajouter_cours(request):
 
 
 @login_required
-@allowed_users(allowed_users=['responsable', 'admin'])
+@allowed_users(['responsable', 'admin_filiere'])
 def ajouter_exercice(request):
     if request.method == 'POST':
         form = ExerciceForm(request.POST, request.FILES)
@@ -207,7 +262,7 @@ def ajouter_exercice(request):
 
 
 @login_required
-@allowed_users(allowed_users=['responsable', 'admin'])
+@allowed_users(['responsable', 'admin_filiere'])
 def ajouter_emploi_du_temps(request):
     if request.method == 'POST':
         form = EmploiDuTempsForm(request.POST, request.FILES)
@@ -223,7 +278,7 @@ def ajouter_emploi_du_temps(request):
 
 
 @login_required
-@allowed_users(allowed_users=['responsable', 'admin'])
+@allowed_users(['responsable', 'admin_filiere'])
 def upload_contenu_pedagogique(request):
     if request.method == 'POST':
         form = ContenuPedagogiqueForm(request.POST, request.FILES)

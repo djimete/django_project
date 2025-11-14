@@ -2,48 +2,38 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # ----------------------------
     # Pages publiques
-    # ----------------------------
     path('register/', views.register, name='register'),
-    path('login/', views.login_view, name='login'),
+    path('register_admin/', views.register_admin, name='register_admin'),
+    path('login/', views.loginPage, name='login'),  # correspond à loginPage dans views.py
     path('logout/', views.logout_view, name='logout'),
 
-    # ----------------------------
     # Pages générales
-    # ----------------------------
     path('', views.home, name='home'),
 
-    # ----------------------------
     # Espace étudiant
-    # ----------------------------
     path('espace_etudiant/', views.espace_etudiant, name='espace_etudiant'),
 
-    # ----------------------------
-    # Administration - Filières
-    # ----------------------------
-    path('administration/liste_filieres/', views.liste_filieres, name='liste_filieres'),
-    path('administration/ajouter_filiere/', views.ajouter_filiere, name='ajouter_filiere'),
+    # Espace Admin
+    path('espace_admin/', views.espace_admin, name='espace_admin'),
 
-    # ----------------------------
-    # Administration - Étudiants
-    # ----------------------------
-    path('administration/ajouter_etudiant/', views.ajouter_etudiant, name='ajouter_etudiant'),
-    path('administration/etudiants_par_filiere/<int:filiere_id>/', views.etudiants_par_filiere, name='etudiants_par_filiere'),
-    path('administration/details/<int:id>/', views.details, name='details'),
-    path('administration/supprimer_etudiant/<int:etudiant_id>/', views.supprimer_etudiant, name='supprimer_etudiant'),
+    # Gestion Filières
+    path('liste_filieres/', views.liste_filieres, name='liste_filieres'),
+    path('ajouter_filiere/', views.ajouter_filiere, name='ajouter_filiere'),
 
-    # ----------------------------
+    # Gestion Étudiants
+    path('ajouter_etudiant/', views.ajouter_etudiant, name='ajouter_etudiant'),
+    path('liste_etudiants/<int:filiere_id>/', views.liste_etudiants_par_filiere, name='liste_etudiants_par_filiere'),
+    path('details_etudiant/<int:etudiant_id>/', views.details_etudiant, name='details_etudiant'),
+    path('supprimer_etudiant/<int:etudiant_id>/', views.supprimer_etudiant, name='supprimer_etudiant'),
+
     # Espace Responsable / Formations
-    # ----------------------------
-    path('formations/espace_responsable/', views.espace_responsable, name='espace_responsable'),
-    path('formations/ajouter_cours/', views.ajouter_cours, name='ajouter_cours'),
-    path('formations/ajouter_exercice/', views.ajouter_exercice, name='ajouter_exercice'),
-    path('formations/ajouter_emploi_du_temps/', views.ajouter_emploi_du_temps, name='ajouter_emploi_du_temps'),
-    path('formations/upload_contenu_pedagogique/', views.upload_contenu_pedagogique, name='upload_contenu_pedagogique'),
+    path('espace_responsable/', views.espace_responsable, name='espace_responsable'),
+    path('ajouter_cours/', views.ajouter_cours, name='ajouter_cours'),
+    path('ajouter_exercice/', views.ajouter_exercice, name='ajouter_exercice'),
+    path('ajouter_emploi_du_temps/', views.ajouter_emploi_du_temps, name='ajouter_emploi_du_temps'),
+    path('upload_contenu_pedagogique/', views.upload_contenu_pedagogique, name='upload_contenu_pedagogique'),
 
-    # ----------------------------
-    # Page de succès (optionnelle)
-    # ----------------------------
-    path('success/', views.success_page, name='success_page'),
+    # Page succès
+    path('success/', views.success_page, name='success'),
 ]
